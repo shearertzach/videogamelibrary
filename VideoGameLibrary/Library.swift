@@ -12,12 +12,19 @@ import Foundation
 class Library {
     
     private var gameArray: [Game] = [Game(title: "League of Legends"), Game(title: "Fortnite"), Game(title: "Rainbow Six: Siege"), Game(title: "Terraria")]
-
+    
     func addGame() {
-        //When we make a new game we need a title for that game.
-        //We need to be able to get user input for the title.
-        //We need to create a new game object using that title.
-        //We need to add the game to our gameArray
+        
+        print("You must be an admin to add or remove a game.\nEnter the password:")
+        let adminPass = String(readLine()!)
+        
+        if adminPass == "thisisthepassword" {
+            
+        } else {
+            print("Incorrect password")
+            return
+        }
+        
         print("Please enter a game title:")
         
         var newGameTitle = readLine()
@@ -27,19 +34,56 @@ class Library {
             newGameTitle = readLine()
         }
         
-        
         let newGame = Game(title: newGameTitle!)
-        
         
         gameArray.append(newGame)
         
         
     }
     
+    func getAvailableGames() -> [Game] {
+        var availableGames = [Game]()
+        
+        for game in gameArray {
+            if game.checkedIn {
+                availableGames.append(game)
+            }
+        }
+        
+        return availableGames
+    }
+    
+    func getUnavailableGames() -> [Game] {
+        var availableGames = [Game]()
+        
+        for game in gameArray {
+            if !game.checkedIn {
+                availableGames.append(game)
+            }
+        }
+        
+        return availableGames
+    }
+    
+    
+    
+    
     func removeGame() {
         
-        for index in 0..<gameArray.count {
-            print("\(index). \(gameArray[index].title)")
+        print("You must be an admin to add or remove a game.\nEnter the password:")
+        let adminPass = String(readLine()!)
+        
+        if adminPass == "thisisthepassword" {
+            
+        } else {
+            print("Incorrect password")
+            return
+        }
+        
+        let availableGames = getAvailableGames()
+        
+        for (index, game) in availableGames.enumerated() {
+            print("\(index). \(game.title)")
         }
         
         print("Please enter the index of the game you want to remove.")
@@ -50,7 +94,16 @@ class Library {
             print("Invalid input. Please enter a useable index.")
             userInput = Int(readLine()!)
         }
-        gameArray.remove(at: userInput!)
+        
+        if availableGames.count < userInput! || userInput! <= -1 {
+            print("You must enter a valid index.")
+            userInput = Int(readLine()!)
+        } else {
+            gameArray.remove(at: userInput!)
+        }
+        
+        
+        
     }
     
     func listAvailableGames() {
@@ -69,7 +122,7 @@ class Library {
                 if let dueDate = game.dueDate {
                     let dateFormatter = DateFormatter()
                     dateFormatter.dateFormat = "MM/dd/yyyy"
-                    print("This game is due on \(dateFormatter.string(from: dueDate))")
+                    print("This game is due on \(dateFormatter.string(from: dueDate))\n")
                 }
             }
         }
@@ -79,43 +132,41 @@ class Library {
     
     
     func checkGameOut() {
+        let availableGames = getAvailableGames()
         
-        for index in 0..<gameArray.count {
-            print("\(index). \(gameArray[index].title)")
+        for (index, game) in availableGames.enumerated(){
+            print("\(index). \(game.title)")
         }
-            print("Please enter the index of the game you want to check out:")
+        print("Please enter the index of the game you want to check out:")
+        
+        
+        var index: Int? = nil
+        
+        repeat {
+            
             var userInput = Int(readLine()!)
+            
             while userInput == nil {
-                print("Please enter a valid index.")
+                print("Invalid input. Please enter a valid index.")
                 userInput = Int(readLine()!)
             }
+            if userInput! >= 0 && userInput! < availableGames.count {
+                index = userInput!
+            } else {
+                print("Invalid input. Please enter a valid index.")
+            }
+        } while index == nil
         
-            gameArray[userInput!].checkedIn = false
-            
-            let currentCalendar = Calendar.current
-            let dueDate = currentCalendar.date(byAdding: .day, value: 14, to: Date())
-            
-            gameArray[userInput!].dueDate = dueDate
-        }
+        let currentCalendar = Calendar.current
+        let twoWeek = currentCalendar.date(byAdding: .day, value: 14, to: Date())
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "MM/dd/yyyy"
         
-
-    
-    func checkGameIn() {
-        for index in 0..<gameArray.count {
-            print("\(index). \(gameArray[index].title)")
-        }
-        print("Please enter the index of the game you want to check in:")
-        var userInput = Int(readLine()!)
-        while userInput == nil {
-            print("Please enter a valid index.")
-            userInput = Int(readLine()!)
-        }
         
-        gameArray[userInput!].checkedIn = true
-        gameArray[userInput!].dueDate = nil
+        availableGames[index!].checkedIn = false
+        availableGames[index!].dueDate = twoWeek
         
-        print("You checked in on")
-        
+        print("\(availableGames[index!].title) is due back on \(dateFormatter.string(from: twoWeek!))")
         
     }
     
@@ -125,9 +176,40 @@ class Library {
     
     
     
-    
-    
-    
-    
+    func checkGameIn() {
+        
+        var gameName = ""
+        let unavailableGames = getUnavailableGames()
+        if unavailableGames.count <= 0 {
+            print("You have not checked out a game.")
+            return
+        }
+        
+        
+        for (index, game) in unavailableGames.enumerated() {
+            if !game.checkedIn {
+                print("\(index). \(game.title)")
+                gameName = game.title
+            }
+        }
+        print("Please enter the index of the game you want to check in:")
+        var userInput: Int? = nil
+        
+        let dueDate = Date()
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "MM/dd/yyyy"
+        
+        repeat {
+            userInput = Int(readLine()!)
+            if unavailableGames.count <= userInput! || userInput! <= -1 {
+                print("Please enter a correct index.")
+                userInput = nil
+            } else {
+                unavailableGames[userInput!].checkedIn = true
+                unavailableGames[userInput!].dueDate = nil
+                print("You checked in \(gameName) on \(dateFormatter.string(from: dueDate))")
+            }
+        }while userInput == nil
+    }
     
 }

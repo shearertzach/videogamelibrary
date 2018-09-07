@@ -16,13 +16,14 @@ class Menu {
     func go() {
         repeat {
             print("""
+        \n
         Menu
-        1. Add Game
-        2. Remove Game
-        3. List Of Available Games
-        4. List Checked Out Games
-        5. Check In Game
-        6. Check Out Game
+        1. Add Game to Library(Admins Only)
+        2. Remove Game from Library(Admins Only)
+        3. List Available Games
+        4. List of Unavailable Games
+        5. Check Game In
+        6. Check Game Out
         7. Help
         8. Quit
         """)
@@ -41,18 +42,19 @@ class Menu {
 
     func quit() {
         shouldQuit = true
-        print("Thanks for using the Video Game Library")
+        print("Thanks for using the Video Game Library!")
     }
 
 func help() {
     print("""
+        \n
         Menu
-        1. Add Game
-        2. Remove Game
-        3. List Of Available Games
-        4. List Checked Out Games
-        5. Check In Game
-        6. Check Out Game
+        1. Add Game to Library(Admins Only)
+        2. Remove Game from Library(Admins Only)
+        3. List Available Games
+        4. List of Unavailable Games
+        5. Check Game In
+        6. Check Game Out
         7. Help
         8. Quit
         """)
