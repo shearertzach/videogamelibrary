@@ -11,7 +11,7 @@ import Foundation
 
 class Library {
     
-    private var gameArray: [Game] = [Game(title: "League of Legends"), Game(title: "Fortnite"), Game(title: "Rainbow Six: Siege"), Game(title: "Terraria")]
+    private var gameArray: [Game] = [Game(title: "League Of Legends", rating: "Teen"), Game(title: "Fortnite", rating: "Everyone"), Game(title: "Rainbow Six: Siege", rating: "Mature"), Game(title: "Terraria", rating: "Everyone")]
     
     func addGame() {
         
@@ -34,12 +34,36 @@ class Library {
             newGameTitle = readLine()
         }
         
-        let newGame = Game(title: newGameTitle!)
+        print("Please enter a rating for your Game:\n(E)Everyone - Any Age\n(T)Teen - 13 & Up\n(M)Mature - 18 & Up")
+        var newGameRating = readLine()
+        repeat {
+            if newGameRating?.lowercased() == "e" {
+                newGameRating = "Everyone"
+                break
+            }else if newGameRating?.lowercased() == "t" {
+                newGameRating = "Teen"
+                break
+            }else if newGameRating?.lowercased() == "m" {
+                newGameRating = "Mature"
+                break
+            }else {
+                print("Please enter a valid rating.")
+                newGameRating = readLine()
+            }
+        
+
+        } while newGameRating?.lowercased() != "e" || newGameRating?.lowercased() != "t" || newGameRating?.lowercased() != "m"
+        
+        
+        let newGame = Game(title: newGameTitle!, rating: newGameRating!)
         
         gameArray.append(newGame)
         
+        print("You added \(newGame.title) to the library with the rating of \(newGame.rating).")
         
     }
+
+    
     
     func getAvailableGames() -> [Game] {
         var availableGames = [Game]()
@@ -66,8 +90,6 @@ class Library {
     }
     
     
-    
-    
     func removeGame() {
         
         print("You must be an admin to add or remove a game.\nEnter the password:")
@@ -83,7 +105,7 @@ class Library {
         let availableGames = getAvailableGames()
         
         for (index, game) in availableGames.enumerated() {
-            print("\(index). \(game.title)")
+            print("\(index). \(game.title)(Rating: \(game.rating))")
         }
         
         print("Please enter the index of the game you want to remove.")
@@ -99,26 +121,27 @@ class Library {
             print("You must enter a valid index.")
             userInput = Int(readLine()!)
         } else {
+            print("You removed \(gameArray[userInput!].title) from the library.")
             gameArray.remove(at: userInput!)
         }
         
-        
-        
+
     }
     
     func listAvailableGames() {
         
         for game in gameArray {
             if game.checkedIn {
-                print(game.title)
+                print("\(game.title)(Rating: \(game.rating))")
             }
         }
     }
     
+    
     func listUnavailableGames() {
         for game in gameArray {
             if !game.checkedIn {
-                print(game.title)
+                print("\(game.title)(Rating: \(game.rating))")
                 if let dueDate = game.dueDate {
                     let dateFormatter = DateFormatter()
                     dateFormatter.dateFormat = "MM/dd/yyyy"
@@ -135,7 +158,7 @@ class Library {
         let availableGames = getAvailableGames()
         
         for (index, game) in availableGames.enumerated(){
-            print("\(index). \(game.title)")
+            print("\(index). \(game.title)(Rating: \(game.rating))")
         }
         print("Please enter the index of the game you want to check out:")
         
@@ -156,6 +179,27 @@ class Library {
                 print("Invalid input. Please enter a valid index.")
             }
         } while index == nil
+        
+        
+        if age >= 18 {
+            
+        } else if age >= 13 {
+            if availableGames[index!].rating == "Mature" {
+                print("You are not old enough for this game.")
+                return
+            }
+            } else if age <= 12 {
+                if availableGames[index!].rating == "Teen" || availableGames[index!].rating == "Mature"{
+                    print("You are not old enough for this game.")
+                    return
+                }
+            }
+    
+
+        
+        
+        
+        
         
         let currentCalendar = Calendar.current
         let twoWeek = currentCalendar.date(byAdding: .day, value: 14, to: Date())
@@ -188,7 +232,7 @@ class Library {
         
         for (index, game) in unavailableGames.enumerated() {
             if !game.checkedIn {
-                print("\(index). \(game.title)")
+            print("\(index). \(game.title)(Rating: \(game.rating))")
                 gameName = game.title
             }
         }
@@ -213,3 +257,23 @@ class Library {
     }
     
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
